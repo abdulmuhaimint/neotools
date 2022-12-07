@@ -1,6 +1,6 @@
-# NodeJS CLI Proof of concept
+# Neotools
 
-This is a poc for the interactive cli development using nodejs
+A cli tool for devs
 
 ### Libraries used
 * [inquirer js](https://github.com/SBoudrias/Inquirer.js)
@@ -23,5 +23,5 @@ npm link
 
 # now you can run the following command from anywhere.
 
-cli_poc
+neotools
 ```

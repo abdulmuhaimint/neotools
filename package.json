@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "type": "module",
   "bin": {
-    "cli_poc": "./dist/index.js"
+    "neotools": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
