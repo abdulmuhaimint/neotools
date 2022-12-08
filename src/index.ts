@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import inquirer from "inquirer";
 import inquirerAutoCompletePrompt from "inquirer-autocomplete-prompt";
-import { questions } from "./interactive/questions.js";
+import { questions } from "./prompts/questions.js";
 import { writeFile } from "./utils/utils.js";
 import inquirerCheckboxPlus from "inquirer-checkbox-plus-prompt";
 

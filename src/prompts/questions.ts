@@ -1,5 +1,5 @@
 import { QuestionCollection } from "inquirer";
-import { languageChoices, osChoices } from "../interactive/choices.js";
+import { languageChoices, osChoices } from "./choices.js";
 import { searchArray } from "../utils/utils.js";
 
 export const questions: QuestionCollection = [
