@@ -1,38 +1,49 @@
 import { QuestionCollection } from "inquirer";
-import { languageChoices, osChoices } from "./choices.js";
 import { searchArray } from "../utils/utils.js";
+import { templates } from "../templates/index.js";
+
+const getSubModuleChoices = (module) => {
+  if (module) return Object.keys(module).filter((key) => key !== "isModule");
+};
+
+export const promptGenerator = async (
+  module,
+  prevAnswer = "",
+  inquirer,
+  arr: string[]
+) => {
+  try {
+    if (Object.keys(module).length && !module.isModule) {
+      let answer = await inquirer.prompt({
+        type: "autocomplete",
+        name: "q1",
+        message: prevAnswer ? "choose a submodule" : "choose a module",
+        source: (answersSoFar, input) =>
+          searchArray(getSubModuleChoices(module), input),
+      });
+      if (answer.q1) {
+        arr.push(answer.q1);
+        await promptGenerator(module[answer.q1], answer.q1, inquirer, arr);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export const questions: QuestionCollection = [
   {
-    type: "list",
-    name: "Language",
-    message: "Choose a language (normal select)",
-    choices: languageChoices,
-  },
-  {
-    type: "checkbox",
-    name: "Languages",
-    message: "Choose the languages (normal checkbox)",
-    choices: languageChoices,
+    type: "autocomplete",
+    name: "template",
+    message: "Choose a template",
+    source: (answersSoFar, input) =>
+      searchArray(getSubModuleChoices(templates), input),
   },
   {
     type: "autocomplete",
-    name: "Operating system",
-    message: "Choose an operating system (search select)",
-    source: (answersSoFar, input) => searchArray(osChoices, input),
-  },
-  {
-    type: "checkbox-plus",
-    name: "Operating systems",
-    message: "Choose the operating systems (search checkbox)",
-    source: (answersSoFar, input) => searchArray(osChoices, input),
-    highlight: true,
-    searchable: true,
-  },
-  {
-    type:"input",
-    name:"output",
-    message:"Enter the output file name",
-    default:"output.json"
+    name: "submodule",
+    message: "Choose a template",
+    source: (answersSoFar, input) =>
+      searchArray(getSubModuleChoices(templates["github-workflows"]), input),
   },
 ];
