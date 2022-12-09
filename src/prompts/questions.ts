@@ -30,20 +30,3 @@ export const promptGenerator = async (
     console.error(error);
   }
 };
-
-export const questions: QuestionCollection = [
-  {
-    type: "autocomplete",
-    name: "template",
-    message: "Choose a template",
-    source: (answersSoFar, input) =>
-      searchArray(getSubModuleChoices(templates), input),
-  },
-  {
-    type: "autocomplete",
-    name: "submodule",
-    message: "Choose a template",
-    source: (answersSoFar, input) =>
-      searchArray(getSubModuleChoices(templates["github-workflows"]), input),
-  },
-];
