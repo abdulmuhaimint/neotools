@@ -6,27 +6,31 @@ import { writeFile } from "./utils/utils.js";
 import inquirerCheckboxPlus from "inquirer-checkbox-plus-prompt";
 import { templates } from "./templates/index.js";
 import fs from "fs/promises";
-import path from "path"
+import path from "path";
+import fse from "fs-extra";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
+const __dirname = path.dirname(__filename);
 const main = async () => {
   try {
     //register inquirer plugins
     inquirer.registerPrompt("autocomplete", inquirerAutoCompletePrompt);
     inquirer.registerPrompt("checkbox-plus", inquirerCheckboxPlus);
     let arr: string[] = [];
+    let templateObj = { obj: { target: "" } };
     //prompts
-    await promptGenerator(templates, "", inquirer, arr);
-    let templateDir = "./src/templates/" + arr.join("/");
-    const files = await fs.readdir(path.resolve(templateDir));
-    console.log(files);
-    // const answers = await inquirer.prompt(questions);
-    // console.log({ answers });
-
-    // let output_file: string = answers.output;
-    // console.log("Writing to " + output_file);
-    // delete answers.output;
-    // //writing answers to output file
-    // await writeFile(output_file, JSON.stringify(answers, null, "  "));
+    await promptGenerator(templates, "", inquirer, arr, templateObj);
+    let templateDir = path.join(__dirname, "./templates/" + arr.join("/"));
+    const files = await fs.readdir(templateDir);
+    // console.log({files,templateObj, templateDir});
+    await fse.ensureDir(path.join(process.cwd(), templateObj.obj.target));
+    await fse.copy(
+      templateDir,
+      path.join(process.cwd(), templateObj.obj.target),
+      { overwrite: false }
+    );
+    console.log(`template added to ${templateObj.obj.target}`);
   } catch (error) {
     console.error(error);
   }

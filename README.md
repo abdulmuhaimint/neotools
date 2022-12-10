@@ -25,3 +25,28 @@ npm link
 
 neotools
 ```
+
+### Template structure  
+Templates are stored in `src/templates` folder. for tracking the different templates we keep an index file in the same folder.  
+
+### Adding a template
+To add a template create a folder inside `src/templates`. Add the template files to this newly created folder.  
+
+Then update the `src/templates/index.ts` file. `index.ts` keeps an object. keys of this object are the name of the template or submodule/category. finally add the boolean isModule and target value to which the templates are copied.  
+Example of index
+
+```
+{
+  "github-workflows": {
+    deployment: {
+      "nodejs-ec2": {
+        isModule: true,
+        target: ".github",
+      },
+    },
+  },
+  //...
+  //add other templates here
+}
+```
+
