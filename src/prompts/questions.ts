@@ -1,17 +1,20 @@
-import { QuestionCollection } from "inquirer";
+import { QuestionCollection, Answers } from "inquirer";
 import { searchArray } from "../utils/utils.js";
-import { templates } from "../templates/index.js";
+import {
+  InquirerType,
+  TemplatesTypeNew,
+} from "../types/template.js";
 
-const getSubModuleChoices = (module) => {
-  if (module) return Object.keys(module).filter((key) => key !== "isModule");
+const getSubModuleChoices = (modules: TemplatesTypeNew) => {
+  if (modules) return Object.keys(modules).filter((key) => key !== "isModule");
 };
 
 export const promptGenerator = async (
-  module,
+  module: TemplatesTypeNew,
   prevAnswer = "",
-  inquirer,
+  inquirer: InquirerType,
   arr: string[],
-  templateObj:{obj:{}}
+  templateObj: { obj: {} }
 ) => {
   try {
     if (Object.keys(module).length && !module.isModule) {
@@ -19,16 +22,23 @@ export const promptGenerator = async (
         type: "autocomplete",
         name: "q1",
         message: prevAnswer ? "choose a submodule" : "choose a module",
-        source: (answersSoFar, input) =>
+        source: (answersSoFar: Answers, input: string) =>
           searchArray(getSubModuleChoices(module), input),
       });
       if (answer.q1) {
         arr.push(answer.q1);
-        await promptGenerator(module[answer.q1], answer.q1, inquirer, arr, templateObj);
+        let index = answer.q1
+        await promptGenerator(
+          module[index],
+          answer.q1,
+          inquirer,
+          arr,
+          templateObj
+        );
       }
     }
-    if(module.isModule){
-      templateObj.obj = module
+    if (module.isModule) {
+      templateObj.obj = module;
     }
   } catch (error) {
     console.error(error);
