@@ -1,46 +1,39 @@
-import { QuestionCollection, Answers } from "inquirer";
+import inquirer from "inquirer";
 import { searchArray } from "../utils/utils.js";
-import {
-  InquirerType,
-  TemplatesTypeNew,
-} from "../types/template.js";
+import axios from "axios";
+import { MONOREPO_RAW_URL } from "../consts.js";
+import { InquirerType } from "../types/template.js";
 
-const getSubModuleChoices = (modules: TemplatesTypeNew) => {
-  if (modules) return Object.keys(modules).filter((key) => key !== "isModule");
+const getSubModuleChoices = async (url: string): Promise<Array<string>> => {
+  const { data } = (await axios.get(url + "/package.json")) || { keywords: [] };
+  return data.keywords;
 };
 
 export const promptGenerator = async (
-  module: TemplatesTypeNew,
-  prevAnswer = "",
-  inquirer: InquirerType,
-  arr: string[],
-  templateObj: { obj: {} }
+  keywords: string[],
+  inquirer: InquirerType
 ) => {
   try {
-    if (Object.keys(module).length && !module.isModule) {
-      let answer = await inquirer.prompt({
-        type: "autocomplete",
-        name: "q1",
-        message: prevAnswer ? "choose a submodule" : "choose a module",
-        source: (answersSoFar: Answers, input: string) =>
-          searchArray(getSubModuleChoices(module), input),
-      });
-      if (answer.q1) {
-        arr.push(answer.q1);
-        let index = answer.q1
-        await promptGenerator(
-          module[index],
-          answer.q1,
-          inquirer,
-          arr,
-          templateObj
-        );
-      }
-    }
-    if (module.isModule) {
-      templateObj.obj = module;
-    }
+    let answer = await inquirer.prompt({
+      type: "autocomplete",
+      name: "q1",
+      message: "choose a module",
+      source: (answersSoFar: any, input: string) =>
+        searchArray(keywords, input),
+    });
+    return answer.q1;
   } catch (error) {
     console.error(error);
   }
+};
+
+export const startPrompt = async () => {
+  let url = `${MONOREPO_RAW_URL}/main`;
+  let answer = ``;
+  let keywords = await getSubModuleChoices(url);
+  while (keywords.length) {
+    answer = answer + "/" + (await promptGenerator(keywords, inquirer));
+    keywords = await getSubModuleChoices(url + answer);
+  }
+  console.log({ answer });
 };
