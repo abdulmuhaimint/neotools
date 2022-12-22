@@ -5,6 +5,7 @@ import { promptGenerator, startPrompt } from "./prompts/questions.js";
 // import inquirerCheckboxPlus from "inquirer-checkbox-plus-prompt";
 import path from "path";
 import fse from "fs-extra";
+import os from "node:os";
 import { fileURLToPath } from "url";
 import degit from "degit";
 import { MONOREPO_URL } from "./consts.js";
@@ -18,7 +19,6 @@ const main = async () => {
     inquirer.registerPrompt("autocomplete", inquirerAutoCompletePrompt);
     // inquirer.registerPrompt("checkbox-plus", inquirerCheckboxPlus);
     const modulePath = await startPrompt();
-    console.log({ modulePath });
 
     //clone the module to a target folder
     const emitter = degit(`${MONOREPO_URL}${modulePath}`);
@@ -29,13 +29,22 @@ const main = async () => {
       default: ".",
     });
 
-    //copy template
+    //copy module to tmp dir
     let targetPath = path.join(process.cwd(), targetAnswer.target);
-    await fse.ensureDir(targetPath);
-    await emitter.clone(targetPath);
-    console.log(`module added to ${targetAnswer.target}`);
+    console.log({targetPath});
+    
+    let degitTmp = path.join(os.tmpdir(), "degit");
+    await fse.emptyDir(degitTmp);
+    await fse.ensureDir(degitTmp);
+    await emitter.clone(degitTmp);
 
-    //remove package from clone module
+    //remove package.json from cloned module
+    await fse.unlink(`${degitTmp}/package.json`);
+
+    //move module to target
+    await fse.ensureDir(targetPath);
+    await fse.copy(degitTmp, targetPath, { overwrite: false });
+    console.log(`module added to ${targetAnswer.target}`);
   } catch (error) {
     console.error(error);
   }
