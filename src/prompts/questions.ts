@@ -35,5 +35,5 @@ export const startPrompt = async () => {
     answer = answer + "/" + (await promptGenerator(keywords, inquirer));
     keywords = await getSubModuleChoices(url + answer);
   }
-  console.log({ answer });
+  return answer;
 };
