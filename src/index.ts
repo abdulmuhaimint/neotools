@@ -39,7 +39,7 @@ const main = async () => {
     await emitter.clone(degitTmp);
 
     //remove package.json from cloned module
-    await fse.unlink(`${degitTmp}/package.json`);
+    await fse.unlink(path.join(degitTmp,'package.json'));
 
     //move module to target
     await fse.ensureDir(targetPath);
