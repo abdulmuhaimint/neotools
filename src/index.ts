@@ -31,7 +31,6 @@ const main = async () => {
 
     //copy module to tmp dir
     let targetPath = path.join(process.cwd(), targetAnswer.target);
-    console.log({targetPath});
     
     let degitTmp = path.join(os.tmpdir(), "degit");
     await fse.emptyDir(degitTmp);
