@@ -2,12 +2,6 @@
 
 A cli tool for devs
 
-### Libraries used
-* [inquirer js](https://github.com/SBoudrias/Inquirer.js)
-* inquirer plugins
-    * [autocomplete](https://github.com/mokkabonna/inquirer-autocomplete-prompt)
-    * [checkbox-plus](https://github.com/faressoft/inquirer-checkbox-plus-prompt)
-
 ### Installation and execution
 ```
 npm install
