@@ -8,7 +8,7 @@ import fse from "fs-extra";
 import os from "node:os";
 import { fileURLToPath } from "url";
 import degit from "degit";
-import { MONOREPO_URL } from "./consts.js";
+// import { MONOREPO_URL } from "./consts.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,32 +18,35 @@ const main = async () => {
     //register inquirer plugins
     inquirer.registerPrompt("autocomplete", inquirerAutoCompletePrompt);
     // inquirer.registerPrompt("checkbox-plus", inquirerCheckboxPlus);
-    const modulePath = await startPrompt();
+    const moduleURL = await startPrompt();
+    if (moduleURL) {
+      //clone the module to a target folder
+      const emitter = degit(moduleURL);
+      const targetAnswer = await inquirer.prompt({
+        type: "input",
+        name: "target",
+        message: "enter the target folder :",
+        default: ".",
+      });
 
-    //clone the module to a target folder
-    const emitter = degit(`${MONOREPO_URL}${modulePath}`);
-    const targetAnswer = await inquirer.prompt({
-      type: "input",
-      name: "target",
-      message: "enter the target folder :",
-      default: ".",
-    });
+      //copy module to tmp dir
+      let targetPath = path.join(process.cwd(), targetAnswer.target);
 
-    //copy module to tmp dir
-    let targetPath = path.join(process.cwd(), targetAnswer.target);
-    
-    let degitTmp = path.join(os.tmpdir(), "degit");
-    await fse.emptyDir(degitTmp);
-    await fse.ensureDir(degitTmp);
-    await emitter.clone(degitTmp);
+      let degitTmp = path.join(os.tmpdir(), "degit");
+      await fse.emptyDir(degitTmp);
+      await fse.ensureDir(degitTmp);
+      await emitter.clone(degitTmp);
 
-    //remove package.json from cloned module
-    await fse.unlink(path.join(degitTmp,'package.json'));
+      //remove package.json from cloned module
+      const exists = fse.existsSync(path.join(degitTmp, "package.json"));
+      if (exists) await fse.unlink(path.join(degitTmp, "package.json"));
 
-    //move module to target
-    await fse.ensureDir(targetPath);
-    await fse.copy(degitTmp, targetPath, { overwrite: false });
-    console.log(`module added to ${targetAnswer.target}`);
+      //move module to target
+      await fse.ensureDir(targetPath);
+      await fse.copy(degitTmp, targetPath, { overwrite: false });
+      console.log(`module added to ${targetAnswer.target}`);
+      await fse.emptyDir(degitTmp); 
+    }
   } catch (error) {
     console.error(error);
   }
