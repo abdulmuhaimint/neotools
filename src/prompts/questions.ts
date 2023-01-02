@@ -30,17 +30,28 @@ export const promptGenerator = async (
 };
 
 export const startPrompt = async () => {
-  let keywords = Object.keys(REPO_INDEX);
+  let targetObject: any = REPO_INDEX;
+  let keywords = Object.keys(targetObject);
   let module = (await promptGenerator(
     keywords,
     inquirer
-  )) as keyof typeof REPO_INDEX;
-  if (!REPO_INDEX[module]) {
+  )) as keyof typeof targetObject;
+  //check if there is sub modules
+  if (typeof targetObject[module] === "object") {
+    targetObject = targetObject[module];
+    keywords = Object.keys(targetObject);
+    if (keywords.length)
+      module = (await promptGenerator(
+        keywords,
+        inquirer
+      )) as keyof typeof targetObject;
+  }
+  if (!targetObject[module]) {
     console.error("no url found");
     return null;
   }
   let url = new URL(
-    path.join(REPO_INDEX[module], "main"),
+    path.join(targetObject[module], "main"),
     REPO_RAW_URL
   ).toString();
   keywords = await getSubModuleChoices(url);
@@ -52,7 +63,6 @@ export const startPrompt = async () => {
       new URL(path.join("main", answer), url).toString()
     );
     console.log(answer);
-    
   }
-  return new URL(path.join(REPO_INDEX[module], answer), GITHUB_URL).toString();
+  return new URL(path.join(targetObject[module], answer), GITHUB_URL).toString();
 };
