@@ -8,7 +8,6 @@ npm install
 npm run build
 npm start
 ```
-
 ### Global installation
 ```
 npm install
@@ -19,3 +18,6 @@ npm link
 
 neotools
 ```
+
+### Adding a module or submodule git repo
+Add modules to `REPO_INDEX` object in `src/consts.ts`. Examples are given the file itself.
