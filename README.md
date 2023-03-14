@@ -1,6 +1,10 @@
 # Neotools
 
-A cli tool for devs
+Neotools is a cli tool made for boilerplating and scaffolding projects.  
+Currently available templates and scaffolds
+1) Devops
+
+More coming soon
 
 ### Installation and execution
 ```
